@@ -1,21 +1,14 @@
 <template>
   <div class="font-sans bg-white text-[#111111] min-h-screen">
-    <div class="max-w-[1180px] mx-auto px-[18px] sm:px-8">
+    <div class="max-w-[1320px] mx-auto px-[18px] sm:px-8">
 
-      <header class="flex justify-between items-center py-5 border-b border-[#EFEFEF]">
-        <router-link to="/" class="text-[22px] font-extrabold tracking-tight">
-          M<span class="text-acento">·</span>Accesorios
-        </router-link>
-        <div class="flex gap-5 items-center text-[13px] font-semibold">
-          <router-link to="/carrito" class="flex items-center gap-1.5">
-            Carrito
-            <i class="bg-black text-white text-[11px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center not-italic">{{ cantidadTotal }}</i>
-          </router-link>
-        </div>
-      </header>
+      <SiteHeader />
 
       <!-- Carrito vacío: no debería poder llegar aquí sin productos -->
-      <div v-if="items.length === 0" class="py-16 text-center flex flex-col items-center gap-4">
+      <div v-if="items.length === 0" class="py-20 text-center flex flex-col items-center gap-4">
+        <div class="w-14 h-14 rounded-full bg-[#F7F7F7] flex items-center justify-center text-[#C2C2C2]">
+          <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        </div>
         <p class="text-sm text-[#6A6A6A]">Tu carrito está vacío.</p>
         <router-link to="/" class="bg-black text-white font-bold text-sm px-6 py-3.5 rounded-full">Ver catálogo</router-link>
       </div>
@@ -49,12 +42,14 @@
 
           <label class="flex items-start gap-2.5 mt-2">
             <input v-model="form.acepta_tratamiento_datos" type="checkbox" required class="mt-0.5">
-            <span class="text-[13px] text-[#5A5A5A] leading-relaxed">
-               Autorizo el tratamiento de mis datos personales conforme a la
+            <span class="text-[13px] text-[#6A6A6A] leading-relaxed">
+              Autorizo el tratamiento de mis datos personales conforme a la
           <router-link to="/politica-de-datos" target="_blank" class="underline font-semibold">Política de tratamiento de datos personales</router-link>,
-                con el fin de procesar este pedido y contactarme sobre su estado.
-            </span>
-          </label>
+              y acepto los
+          <router-link to="/terminos-y-condiciones" target="_blank" class="underline font-semibold">Términos y condiciones</router-link>
+              de esta compra.
+  </span>
+</label>
 
           <p v-if="errorEnvio" class="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2.5">{{ errorEnvio }}</p>
 
@@ -76,7 +71,7 @@
           <h2 class="text-base font-extrabold">Resumen del pedido</h2>
           <div class="flex flex-col gap-3 divide-y divide-[#E5E5E5]">
             <div v-for="item in items" :key="item.producto_id" class="flex justify-between gap-3 pt-3 first:pt-0 text-sm">
-              <span class="text-[#5A5A5A]">{{ item.nombre }} × {{ item.cantidad }}</span>
+              <span class="text-[#6A6A6A]">{{ item.nombre }} × {{ item.cantidad }}</span>
               <span class="font-bold shrink-0">${{ formatearPrecio(item.precio_venta * item.cantidad) }}</span>
             </div>
           </div>
@@ -88,10 +83,7 @@
 
       </div>
 
-      <footer class="py-8 pb-14 flex flex-col sm:flex-row justify-between gap-2 text-[13px] text-[#8A8A8A] mt-6 border-t border-[#EFEFEF]">
-        <span class="font-extrabold">M Accesorios</span>
-        <span>© {{ anioActual }} · Cali, Colombia</span>
-      </footer>
+      <SiteFooter />
 
     </div>
   </div>
@@ -102,12 +94,12 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../api/axios'
 import { useCarrito } from '../composables/useCarrito'
+import SiteHeader from '../components/SiteHeader.vue'
+import SiteFooter from '../components/SiteFooter.vue'
+import { formatearPrecio } from '../utils/formato'
 
 const router = useRouter()
-const { items, cantidadTotal, totalPedido, vaciarCarrito } = useCarrito()
-
-const anioActual = new Date().getFullYear()
-const formatearPrecio = (valor) => parseFloat(valor).toLocaleString('es-CO')
+const { items, totalPedido, vaciarCarrito } = useCarrito()
 
 const form = ref({
   nombre_cliente: '',

@@ -1,28 +1,19 @@
 <template>
   <div class="font-sans bg-white text-[#111111] min-h-screen">
-    <div class="max-w-[1180px] mx-auto px-[18px] sm:px-8">
+    <div class="max-w-[1320px] mx-auto px-[18px] sm:px-8">
 
       <!-- Header (igual al resto de la tienda) -->
-      <header class="flex justify-between items-center py-5 border-b border-[#EFEFEF]">
-        <router-link to="/" class="text-[22px] font-extrabold tracking-tight">
-          M<span class="text-acento">·</span>Accesorios
-        </router-link>
-        <div class="flex gap-5 items-center text-[13px] font-semibold">
-          <a href="#" class="hidden sm:inline">Buscar</a>
-          <router-link to="#">Mi cuenta</router-link>
-          <router-link to="/carrito" class="flex items-center gap-1.5">
-            Carrito
-            <i class="bg-black text-white text-[11px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center not-italic">{{ cantidadTotal }}</i>
-          </router-link>
-        </div>
-      </header>
+      <SiteHeader />
 
       <h1 class="text-2xl md:text-[32px] font-extrabold mt-8 mb-6">Tu carrito</h1>
 
       <!-- Carrito vacío -->
-      <div v-if="items.length === 0" class="py-16 text-center flex flex-col items-center gap-4">
-        <p class="text-sm text-[#6A6A6A]">Todavía no has agregado productos.</p>
-        <router-link to="/" class="bg-black text-white font-bold text-sm px-6 py-3.5 rounded-full">Ver catálogo</router-link>
+      <div v-if="items.length === 0" class="py-20 text-center flex flex-col items-center gap-4">
+        <div class="w-16 h-16 rounded-full bg-[#F7F7F7] flex items-center justify-center text-[#C2C2C2]">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        </div>
+        <p class="text-sm text-[#6A6A6A] max-w-xs">Todavía no has agregado productos a tu carrito.</p>
+        <router-link to="/" class="bg-black text-white font-bold text-sm px-6 py-3.5 rounded-full mt-1">Ver catálogo</router-link>
       </div>
 
       <template v-else>
@@ -60,10 +51,7 @@
         </div>
       </template>
 
-      <footer class="py-8 pb-14 flex flex-col sm:flex-row justify-between gap-2 text-[13px] text-[#8A8A8A] mt-6 border-t border-[#EFEFEF]">
-        <span class="font-extrabold">M Accesorios</span>
-        <span>© {{ anioActual }} · Cali, Colombia</span>
-      </footer>
+      <SiteFooter />
 
     </div>
   </div>
@@ -71,9 +59,9 @@
 
 <script setup>
 import { useCarrito } from '../composables/useCarrito'
+import SiteHeader from '../components/SiteHeader.vue'
+import SiteFooter from '../components/SiteFooter.vue'
+import { formatearPrecio } from '../utils/formato'
 
 const { items, cantidadTotal, totalPedido, actualizarCantidad, quitarProducto } = useCarrito()
-
-const anioActual = new Date().getFullYear()
-const formatearPrecio = (valor) => parseFloat(valor).toLocaleString('es-CO')
 </script>

@@ -1,12 +1,8 @@
 <template>
   <div class="font-sans bg-white text-[#111111] min-h-screen">
-    <div class="max-w-[1180px] mx-auto px-[18px] sm:px-8">
+    <div class="max-w-[1320px] mx-auto px-[18px] sm:px-8">
 
-      <header class="flex justify-between items-center py-5 border-b border-[#EFEFEF]">
-        <router-link to="/" class="text-[22px] font-extrabold tracking-tight">
-          M<span class="text-acento">·</span>Accesorios
-        </router-link>
-      </header>
+      <SiteHeader />
 
       <div v-if="cargando" class="py-20 text-center text-sm text-[#9A9A9A]">Buscando tu pedido...</div>
       <div v-else-if="error" class="py-20 text-center flex flex-col items-center gap-4">
@@ -34,7 +30,7 @@
           </div>
           <div class="flex flex-col gap-2 divide-y divide-[#E5E5E5] pt-2 mt-1 border-t border-[#E5E5E5]">
             <div v-for="detalle in pedido.detalles" :key="detalle.id" class="flex justify-between pt-2 first:pt-0 text-sm">
-              <span class="text-[#5A5A5A]">{{ detalle.nombre_producto }} × {{ detalle.cantidad }}</span>
+              <span class="text-[#6A6A6A]">{{ detalle.nombre_producto }} × {{ detalle.cantidad }}</span>
               <span class="font-bold shrink-0">${{ formatearPrecio(detalle.precio_unitario * detalle.cantidad) }}</span>
             </div>
           </div>
@@ -49,10 +45,7 @@
         <router-link to="/" class="text-sm font-bold border-b-[1.5px] border-black pb-0.5 mt-2">Volver al catálogo</router-link>
       </div>
 
-      <footer class="py-8 pb-14 flex flex-col sm:flex-row justify-between gap-2 text-[13px] text-[#8A8A8A] mt-10 border-t border-[#EFEFEF]">
-        <span class="font-extrabold">M Accesorios</span>
-        <span>© {{ anioActual }} · Cali, Colombia</span>
-      </footer>
+      <SiteFooter />
 
     </div>
   </div>
@@ -62,15 +55,15 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import api from '../api/axios'
+import SiteHeader from '../components/SiteHeader.vue'
+import SiteFooter from '../components/SiteFooter.vue'
+import { formatearPrecio } from '../utils/formato'
 
 const route = useRoute()
 
 const pedido = ref(null)
 const cargando = ref(true)
 const error = ref(false)
-
-const anioActual = new Date().getFullYear()
-const formatearPrecio = (valor) => parseFloat(valor).toLocaleString('es-CO')
 
 const estiloEstado = computed(() => {
   const estado = pedido.value?.estado

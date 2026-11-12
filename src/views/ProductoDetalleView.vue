@@ -1,40 +1,54 @@
 <template>
   <div class="font-sans bg-white text-[#111111] min-h-screen">
-    <div class="max-w-[1180px] mx-auto px-[18px] sm:px-8">
+    <div class="max-w-[1320px] mx-auto px-[18px] sm:px-8">
 
       <!-- Header (igual al Home) -->
-      <header class="flex justify-between items-center py-5 border-b border-[#EFEFEF]">
-        <router-link to="/" class="text-[22px] font-extrabold tracking-tight">
-          M<span class="text-acento">·</span>Accesorios
-        </router-link>
-        <div class="flex gap-5 items-center text-[13px] font-semibold">
-          <a href="#" class="hidden sm:inline">Buscar</a>
-          <router-link to="#">Mi cuenta</router-link>
-          <router-link to="/carrito" class="flex items-center gap-1.5">
-            Carrito
-            <i class="bg-black text-white text-[11px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center not-italic">{{ cantidadTotal }}</i>
-          </router-link>
-        </div>
-      </header>
+      <SiteHeader />
 
-      <div v-if="cargando" class="py-20 text-center text-sm text-[#9A9A9A]">Cargando producto...</div>
-      <div v-else-if="error" class="py-20 text-center text-sm text-red-500">
-        No encontramos este producto.
-        <router-link to="/" class="underline block mt-2">Volver al catálogo</router-link>
+      <!-- Esqueleto de carga -->
+      <div v-if="cargando" class="grid grid-cols-1 md:grid-cols-[1.1fr_1fr] gap-10 items-start py-8">
+        <div class="aspect-square bg-[#F4F4F4] rounded-lg animate-pulse"></div>
+        <div class="flex flex-col gap-4">
+          <div class="h-9 w-4/5 bg-[#F0F0F0] rounded animate-pulse"></div>
+          <div class="h-4 w-full bg-[#F0F0F0] rounded animate-pulse"></div>
+          <div class="h-4 w-3/5 bg-[#F0F0F0] rounded animate-pulse"></div>
+          <div class="h-8 w-32 bg-[#F0F0F0] rounded animate-pulse mt-2"></div>
+          <div class="h-12 w-44 bg-[#F0F0F0] rounded-full animate-pulse mt-2"></div>
+        </div>
+      </div>
+
+      <div v-else-if="error" class="py-20 text-center flex flex-col items-center gap-4">
+        <div class="w-14 h-14 rounded-full bg-[#F7F7F7] flex items-center justify-center text-[#C2C2C2]">
+          <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <p class="text-sm text-[#6A6A6A]">No encontramos este producto.</p>
+        <router-link to="/" class="bg-black text-white font-bold text-sm px-6 py-3.5 rounded-full">Volver al catálogo</router-link>
       </div>
 
       <template v-else-if="producto">
         <router-link to="/" class="inline-block text-[13px] font-semibold text-[#6A6A6A] mt-6">← Volver al catálogo</router-link>
 
         <section class="grid grid-cols-1 md:grid-cols-[1.1fr_1fr] gap-10 items-start py-8">
-          <div class="aspect-square bg-[#F4F4F4] rounded-lg flex items-center justify-center text-[11px] tracking-wider uppercase text-[#B0B0B0] overflow-hidden">
+          <div class="relative aspect-square bg-[#F4F4F4] rounded-lg flex items-center justify-center text-[11px] tracking-wider uppercase text-[#B0B0B0] overflow-hidden">
             <img v-if="producto.imagen_url" :src="producto.imagen_url" class="w-full h-full object-cover" alt="">
             <span v-else>Foto de producto</span>
+            <button
+              @click="alternarFavorito(producto.id)"
+              class="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
+              :aria-label="esFavorito(producto.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                :fill="esFavorito(producto.id) ? '#C9792F' : 'none'"
+                :stroke="esFavorito(producto.id) ? '#C9792F' : '#111111'"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              ><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            </button>
           </div>
 
           <div class="flex flex-col gap-4">
             <h1 class="text-3xl md:text-[40px] leading-[1.05] font-extrabold tracking-tight m-0">{{ producto.nombre }}</h1>
-            <p class="text-[15px] text-[#5A5A5A] leading-relaxed m-0">{{ producto.descripcion || 'Sin descripción adicional.' }}</p>
+            <p class="text-[15px] text-[#6A6A6A] leading-relaxed m-0">{{ producto.descripcion || 'Sin descripción adicional.' }}</p>
 
             <div class="flex items-baseline gap-2.5">
               <span class="text-3xl font-extrabold">${{ formatearPrecio(producto.precio_venta) }}</span>
@@ -73,10 +87,7 @@
         </section>
       </template>
 
-      <footer class="py-8 pb-14 flex flex-col sm:flex-row justify-between gap-2 text-[13px] text-[#8A8A8A] mt-10 border-t border-[#EFEFEF]">
-        <span class="font-extrabold">M Accesorios</span>
-        <span>© {{ anioActual }} · Cali, Colombia</span>
-      </footer>
+      <SiteFooter />
 
     </div>
   </div>
@@ -87,19 +98,22 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import api from '../api/axios'
 import { useCarrito } from '../composables/useCarrito'
+import { useFavoritos } from '../composables/useFavoritos'
+import { useToast } from '../composables/useToast'
+import SiteHeader from '../components/SiteHeader.vue'
+import SiteFooter from '../components/SiteFooter.vue'
+import { formatearPrecio } from '../utils/formato'
 
 const route = useRoute()
-const { cantidadTotal, agregarProducto } = useCarrito()
+const { agregarProducto } = useCarrito()
+const { esFavorito, alternarFavorito } = useFavoritos()
+const { mostrarToast } = useToast()
 
 const producto = ref(null)
 const cargando = ref(true)
 const error = ref(false)
 const cantidad = ref(1)
 const agregado = ref(false)
-
-const anioActual = new Date().getFullYear()
-
-const formatearPrecio = (valor) => parseFloat(valor).toLocaleString('es-CO')
 
 const cargarProducto = async (id) => {
   cargando.value = true
@@ -109,6 +123,7 @@ const cargarProducto = async (id) => {
   try {
     const res = await api.get(`/productos/${id}`)
     producto.value = res.data
+    document.title = `${producto.value.nombre} — M Accesorios`
   } catch (e) {
     console.error(e)
     error.value = true
@@ -120,6 +135,7 @@ const cargarProducto = async (id) => {
 const agregarAlCarrito = () => {
   agregarProducto(producto.value, cantidad.value)
   agregado.value = true
+  mostrarToast(`${producto.value.nombre} se agregó a tu carrito`)
   setTimeout(() => { agregado.value = false }, 1500)
 }
 

@@ -4,3 +4,19 @@
   --color-acento: #C9792F;
   --font-sans: "Hanken Grotesk", sans-serif;
 }
+
+html {
+  /* Reserva siempre el espacio de la barra de scroll, haya o no scroll
+     en la página actual, para que el contenido no "salte" al navegar
+     entre una vista alta (con scroll) y una corta (sin scroll). */
+  scrollbar-gutter: stable;
+}
+
+html, body {
+  /* El hero full-bleed del Home usa 100vw para romper el contenedor de
+     1320px. Cuando hay scroll vertical, 100vw queda un poco más ancho que
+     el área visible real (incluye el espacio de la barra de scroll), lo
+     que genera un desborde horizontal invisible. Esto lo bloquea sin
+     recortar nada perceptible del diseño. */
+  overflow-x: hidden;
+}

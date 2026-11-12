@@ -1,12 +1,8 @@
 <template>
   <div class="font-sans bg-white text-[#111111] min-h-screen">
-    <div class="max-w-[1180px] mx-auto px-[18px] sm:px-8">
+    <div class="max-w-[1320px] mx-auto px-[18px] sm:px-8">
 
-      <header class="flex justify-between items-center py-5 border-b border-[#EFEFEF]">
-        <router-link to="/" class="text-[22px] font-extrabold tracking-tight">
-          M<span class="text-acento">·</span>Accesorios
-        </router-link>
-      </header>
+      <SiteHeader />
 
       <div class="max-w-2xl mx-auto py-12 flex flex-col gap-6">
         <router-link to="/" class="text-[13px] font-semibold text-[#6A6A6A] w-fit">← Volver al catálogo</router-link>
@@ -14,7 +10,7 @@
         <h1 class="text-3xl font-extrabold tracking-tight">Política de tratamiento de datos personales</h1>
         <p class="text-sm text-[#9A9A9A] -mt-2">Última actualización: {{ fechaActualizacion }}</p>
 
-        <section class="flex flex-col gap-2 text-[15px] text-[#3A3A3A] leading-relaxed">
+        <section class="flex flex-col gap-2 text-[15px] text-[#6A6A6A] leading-relaxed">
           <h2 class="text-lg font-bold text-[#111111] mt-2">1. Responsable del tratamiento</h2>
           <p>
             <strong>M Accesorios</strong> ([Nombre o razón social completa], NIT/Cédula [Número]),
@@ -70,17 +66,16 @@
         </section>
       </div>
 
-      <footer class="py-8 pb-14 flex flex-col sm:flex-row justify-between gap-2 text-[13px] text-[#8A8A8A] mt-6 border-t border-[#EFEFEF]">
-        <span class="font-extrabold">M Accesorios</span>
-        <span>© {{ anioActual }} · Cali, Colombia</span>
-      </footer>
+      <SiteFooter />
 
     </div>
   </div>
 </template>
 
 <script setup>
-const anioActual = new Date().getFullYear()
+import SiteHeader from '../components/SiteHeader.vue'
+import SiteFooter from '../components/SiteFooter.vue'
+
 const fechaActualizacion = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' })
 const whatsappNumero = import.meta.env.VITE_WHATSAPP_NUMERO || '[Número]'
 const correoContacto = import.meta.env.VITE_CORREO_CONTACTO || '[correo de contacto]'
