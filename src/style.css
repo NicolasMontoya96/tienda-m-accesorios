@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+@theme {
+  --color-acento: #C9792F;
+  --font-sans: "Hanken Grotesk", sans-serif;
+}
