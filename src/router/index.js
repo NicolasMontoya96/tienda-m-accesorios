@@ -9,6 +9,8 @@ const router = createRouter({
     { path: '/carrito', name: 'carrito', component: () => import('../views/CarritoView.vue') },
     { path: '/checkout', name: 'checkout', component: () => import('../views/CheckoutView.vue') },
     { path: '/pedido/:referencia', name: 'confirmacion', component: () => import('../views/ConfirmacionView.vue') },
+    { path: '/politica-de-datos', name: 'politica-datos', component: () => import('../views/PoliticaDatosView.vue') },
+    { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('../views/NotFoundView.vue') },
   ],
 })
 

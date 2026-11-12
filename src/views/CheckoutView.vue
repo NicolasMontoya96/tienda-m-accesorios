@@ -50,7 +50,9 @@
           <label class="flex items-start gap-2.5 mt-2">
             <input v-model="form.acepta_tratamiento_datos" type="checkbox" required class="mt-0.5">
             <span class="text-[13px] text-[#5A5A5A] leading-relaxed">
-              Autorizo el tratamiento de mis datos personales conforme a la Ley 1581 de 2012, con el fin de procesar este pedido y contactarme sobre su estado.
+               Autorizo el tratamiento de mis datos personales conforme a la
+          <router-link to="/politica-de-datos" target="_blank" class="underline font-semibold">Política de tratamiento de datos personales</router-link>,
+                con el fin de procesar este pedido y contactarme sobre su estado.
             </span>
           </label>
 
