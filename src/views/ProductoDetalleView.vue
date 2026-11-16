@@ -75,9 +75,9 @@
                 v-if="producto.stock > 0"
                 @click="agregarAlCarrito"
                 class="bg-black text-white font-bold text-sm px-6 py-3.5 rounded-full disabled:opacity-50"
-                :disabled="agregado"
+                :disabled="agregado || revalidando"
               >
-                {{ agregado ? 'Agregado ✓' : 'Agregar al carrito' }}
+                {{ agregado ? 'Agregado ✓' : (revalidando ? 'Agregando...' : 'Agregar al carrito') }}
               </button>
               <button v-else class="bg-[#F0F0F0] text-[#9A9A9A] font-bold text-sm px-6 py-3.5 rounded-full cursor-not-allowed" disabled>
                 Agotado
@@ -114,6 +114,7 @@ const cargando = ref(true)
 const error = ref(false)
 const cantidad = ref(1)
 const agregado = ref(false)
+const revalidando = ref(false)
 
 const cargarProducto = async (id) => {
   cargando.value = true
@@ -132,7 +133,32 @@ const cargarProducto = async (id) => {
   }
 }
 
-const agregarAlCarrito = () => {
+// Antes de agregar al carrito, revalidamos el stock contra el servidor: si la
+// pestaña quedó abierta un rato, el stock que se ve en pantalla puede estar
+// desactualizado (otro cliente compró, o el admin ajustó el inventario).
+const agregarAlCarrito = async () => {
+  revalidando.value = true
+  try {
+    const res = await api.get(`/productos/tienda/${producto.value.id}`)
+    producto.value.stock = res.data.stock
+  } catch (e) {
+    // Si la revalidación falla (red, etc.), seguimos con el stock que ya
+    // teníamos en pantalla en vez de bloquear la compra por completo.
+  } finally {
+    revalidando.value = false
+  }
+
+  if (producto.value.stock <= 0) {
+    mostrarToast('Este producto ya no tiene stock disponible.')
+    cantidad.value = 1
+    return
+  }
+  if (cantidad.value > producto.value.stock) {
+    cantidad.value = producto.value.stock
+    mostrarToast(`Solo quedan ${producto.value.stock} unidades disponibles. Ajustamos la cantidad.`)
+    return
+  }
+
   agregarProducto(producto.value, cantidad.value)
   agregado.value = true
   mostrarToast(`${producto.value.nombre} se agregó a tu carrito`)
