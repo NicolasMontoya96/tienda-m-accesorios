@@ -30,19 +30,17 @@
       <div v-else-if="error" class="py-20 text-center text-sm text-red-500">No pudimos cargar el catálogo. Intenta de nuevo más tarde.</div>
 
       <template v-else>
-        <!-- Hero: carrusel de productos destacados, a todo el ancho de la pantalla.
-             Rompe el contenedor de 1320px con el truco estándar de "full-bleed":
-             ancho 100vw + márgenes negativos calculados contra el padre, así
-             funciona sin importar el padding/centrado del contenedor exterior. -->
-        <section
-          v-if="productoActivo"
-          class="relative w-screen ml-[calc(-50vw+50%)] mr-[calc(-50vw+50%)] overflow-hidden"
-        >
+        <!-- Hero: carrusel de productos destacados. Se mantiene DENTRO del
+             mismo contenedor de 1320px que usa el resto de la página (nav,
+             grid de productos, footer) — antes rompía el contenedor con un
+             truco "full-bleed" que tocaba el borde derecho de la pantalla,
+             pero dejaba el resto del sitio con márgenes simétricos, y eso
+             hacía ver la página descuadrada en pantallas anchas. -->
+        <section v-if="productoActivo" class="relative my-6 md:my-8">
           <transition name="fade-slide" mode="out-in">
-            <div :key="productoActivo.id" class="grid grid-cols-1 md:grid-cols-[1fr_1.15fr] md:min-h-[520px]">
+            <div :key="productoActivo.id" class="grid grid-cols-1 md:grid-cols-[1fr_1.15fr] md:min-h-[480px] rounded-xl overflow-hidden">
 
-              <!-- Imagen: a sangre completa (toca el borde derecho de la pantalla).
-                   En móvil va arriba; en escritorio, a la derecha. -->
+              <!-- Imagen: en móvil va arriba; en escritorio, a la derecha. -->
               <div class="relative order-1 md:order-2 aspect-[16/11] md:aspect-auto bg-[#F4F4F4] overflow-hidden">
                 <img
                   v-if="productoActivo.imagen_url"
@@ -83,9 +81,8 @@
                 </div>
               </div>
 
-              <!-- Texto: mantiene el mismo margen izquierdo que el resto del sitio,
-                   aunque la sección sea full-bleed, para que no quede descuadrado. -->
-              <div class="order-2 md:order-1 flex flex-col justify-center gap-4 py-10 md:py-14 pl-[max(18px,calc((100vw-1320px)/2))] sm:pl-[max(32px,calc((100vw-1320px)/2))] pr-[18px] sm:pr-8 md:pr-10">
+              <!-- Texto -->
+              <div class="order-2 md:order-1 flex flex-col justify-center gap-4 py-10 md:py-14 px-6 sm:px-8 md:pl-10 md:pr-10 bg-white">
                 <small class="text-xs font-bold tracking-wider uppercase text-acento">Nuevo ingreso</small>
                 <h1 class="text-4xl md:text-[52px] leading-[1.02] font-extrabold tracking-tight m-0">{{ productoActivo.nombre }}</h1>
                 <p class="text-[15px] text-[#6A6A6A] max-w-[380px] leading-relaxed m-0">{{ productoActivo.descripcion || 'El mismo producto que tenemos físicamente en tienda, listo para enviar.' }}</p>
@@ -111,49 +108,12 @@
           <p class="text-sm text-[#9A9A9A] max-w-xs">Todavía no hay productos en esta categoría. Vuelve pronto o mira el resto del catálogo.</p>
         </div>
         <div v-else class="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-7">
-          <div
+          <ProductoCard
             v-for="producto in productosFiltrados"
             :key="producto.id"
-            class="group flex flex-col gap-2.5 cursor-pointer"
-            @click="verProducto(producto)"
-          >
-            <div class="relative aspect-square bg-[#F7F7F7] rounded-[10px] flex items-center justify-center text-[10px] tracking-wide uppercase text-[#C2C2C2] overflow-hidden transition-shadow group-hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
-              <img
-                v-if="producto.imagen_url"
-                :src="producto.imagen_url"
-                class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
-                :class="{ 'grayscale opacity-60': producto.stock === 0 }"
-                alt=""
-              >
-              <span v-else :class="{ 'opacity-60': producto.stock === 0 }">Foto</span>
-              <span
-                v-if="producto.stock === 0"
-                class="absolute top-2.5 left-2.5 bg-[#111111] text-white text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full"
-              >Sin stock</span>
-              <button
-                @click.stop="alternarFavorito(producto.id)"
-                class="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
-                :aria-label="esFavorito(producto.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
-                  :fill="esFavorito(producto.id) ? '#C9792F' : 'none'"
-                  :stroke="esFavorito(producto.id) ? '#C9792F' : '#111111'"
-                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                ><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-              </button>
-            </div>
-            <span class="text-[15px] font-bold leading-snug">{{ producto.nombre }}</span>
-            <span class="text-[12px] text-[#9A9A9A] -mt-1.5">{{ nombreCategoria(producto.categoria_id) }}</span>
-            <span class="flex items-baseline gap-2">
-              <b class="text-base font-extrabold">${{ formatearPrecio(producto.precio_venta) }}</b>
-            </span>
-            <span
-              v-if="producto.stock > 0"
-              class="text-[13px] font-bold text-acento -mt-0.5"
-            >Más información</span>
-            <span v-else class="text-[13px] font-bold text-[#B0B0B0] -mt-0.5">Agotado</span>
-          </div>
+            :producto="producto"
+            :categorias="listaCategorias"
+          />
         </div>
 
         <!-- Franja de confianza -->
@@ -201,27 +161,27 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../api/axios'
 import { useCatalogo } from '../composables/useCatalogo'
-import { useFavoritos } from '../composables/useFavoritos'
 import SiteHeader from '../components/SiteHeader.vue'
 import SiteFooter from '../components/SiteFooter.vue'
-import { formatearPrecio, nombreCategoria as nombreCategoriaDe } from '../utils/formato'
+import ProductoCard from '../components/ProductoCard.vue'
+import { formatearPrecio } from '../utils/formato'
+import { whatsappNumero } from '../utils/contacto'
 
 const route = useRoute()
 const router = useRouter()
 const { productos: listaProductos, categorias: listaCategorias, cargando, error, cargarCatalogo } = useCatalogo()
-const { esFavorito, alternarFavorito } = useFavoritos()
 
-const whatsappNumero = import.meta.env.VITE_WHATSAPP_NUMERO || '[Número]'
 
-const nombreCategoria = (categoriaId) => nombreCategoriaDe(listaCategorias.value, categoriaId)
-
-// Carrusel del hero: rota entre los primeros 5 productos del catálogo
+// Carrusel del hero: rota entre los primeros 5 productos de la categoría
+// activa (antes usaba siempre los primeros 5 del catálogo completo, sin
+// importar la categoría seleccionada, así que la imagen grande no cambiaba
+// al navegar entre pestañas aunque el grid de abajo sí lo hacía).
 const indiceActivo = ref(0)
-const slides = computed(() => listaProductos.value.slice(0, 5))
+const slides = computed(() => productosFiltrados.value.slice(0, 5))
 const productoActivo = computed(() => slides.value[indiceActivo.value] || null)
 let intervaloCarrusel = null
 
@@ -257,6 +217,14 @@ const productosFiltrados = computed(() => {
 const verProducto = (producto) => {
   router.push(`/producto/${producto.id}`)
 }
+
+// Al cambiar de categoría, la lista de slides del hero cambia por completo,
+// así que el índice anterior puede quedar apuntando a un producto que ya no
+// está ahí (o fuera de rango). Lo reseteamos para empezar siempre en el
+// primer producto de la categoría recién seleccionada.
+watch(categoriaActivaId, () => {
+  indiceActivo.value = 0
+})
 
 onMounted(() => {
   cargarCatalogo()

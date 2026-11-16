@@ -51,12 +51,12 @@ import { useRouter } from 'vue-router'
 import api from '../api/axios'
 import SiteHeader from '../components/SiteHeader.vue'
 import SiteFooter from '../components/SiteFooter.vue'
+import { whatsappNumero } from '../utils/contacto'
 
 const router = useRouter()
 const referencia = ref('')
 const buscando = ref(false)
 const errorMsg = ref('')
-const whatsappNumero = import.meta.env.VITE_WHATSAPP_NUMERO || '573187925674'
 
 const buscarPedido = async () => {
   errorMsg.value = ''

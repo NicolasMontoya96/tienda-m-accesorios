@@ -75,8 +75,7 @@
 <script setup>
 import SiteHeader from '../components/SiteHeader.vue'
 import SiteFooter from '../components/SiteFooter.vue'
+import { whatsappNumero, correoContacto } from '../utils/contacto'
 
 const fechaActualizacion = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' })
-const whatsappNumero = import.meta.env.VITE_WHATSAPP_NUMERO || '[Número]'
-const correoContacto = import.meta.env.VITE_CORREO_CONTACTO || '[correo de contacto]'
 </script>
