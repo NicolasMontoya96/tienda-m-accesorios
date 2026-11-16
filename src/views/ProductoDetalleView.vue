@@ -121,7 +121,7 @@ const cargarProducto = async (id) => {
   agregado.value = false
   cantidad.value = 1
   try {
-    const res = await api.get(`/productos/${id}`)
+    const res = await api.get(`/productos/tienda/${id}`)
     producto.value = res.data
     document.title = `${producto.value.nombre} — M Accesorios`
   } catch (e) {

@@ -15,7 +15,7 @@ async function cargarCatalogo() {
   error.value = false
   try {
     const [resProductos, resCategorias] = await Promise.all([
-      api.get('/productos/'),
+      api.get('/productos/tienda'),
       api.get('/categorias/'),
     ])
     productos.value = resProductos.data
