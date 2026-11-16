@@ -13,7 +13,7 @@
         <section class="flex flex-col gap-2 text-[15px] text-[#6A6A6A] leading-relaxed">
           <h2 class="text-lg font-bold text-[#111111] mt-2">1. Responsable del tratamiento</h2>
           <p>
-            <strong>M Accesorios</strong> ([Nombre o razón social completa], NIT/Cédula [Número]),
+            <strong>M Accesorios</strong> (Cédula {{ cedulaNegocio }}),
             con domicilio en Cali, Colombia, es responsable del tratamiento de los datos personales
             que usted suministra al realizar un pedido en este sitio. Puede contactarnos por
             WhatsApp al {{ whatsappNumero }} o al correo electrónico {{ correoContacto }}.
@@ -76,6 +76,11 @@
 import SiteHeader from '../components/SiteHeader.vue'
 import SiteFooter from '../components/SiteFooter.vue'
 import { whatsappNumero, correoContacto } from '../utils/contacto'
+
+// Persona natural: va cédula, no NIT (el NIT aplica a empresas o a
+// personas naturales comerciantes registradas en DIAN). Queda como
+// placeholder hasta que se decida si se publica el número real.
+const cedulaNegocio = import.meta.env.VITE_CEDULA_NEGOCIO || '[Número]'
 
 const fechaActualizacion = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' })
 </script>

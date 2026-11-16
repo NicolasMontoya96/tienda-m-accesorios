@@ -13,9 +13,8 @@
         <section class="flex flex-col gap-2">
           <h2 class="text-base font-extrabold">1. Quiénes somos</h2>
           <p class="text-[14px] text-[#6A6A6A] leading-relaxed">
-            M Accesorios, operado por <strong>[Nombre o razón social completa]</strong>, identificado con
-            NIT/Cédula <strong>[Número]</strong>, con domicilio en Cali, Colombia, es responsable de la
-            venta de los productos ofrecidos en este sitio web.
+            M Accesorios, identificado con Cédula <strong>{{ cedulaNegocio }}</strong>, con domicilio en
+            Cali, Colombia, es responsable de la venta de los productos ofrecidos en este sitio web.
           </p>
         </section>
 
@@ -116,6 +115,10 @@ import SiteHeader from '../components/SiteHeader.vue'
 import SiteFooter from '../components/SiteFooter.vue'
 import { whatsappNumero, correoContacto } from '../utils/contacto'
 
+// Persona natural: va cédula, no NIT (el NIT aplica a empresas o a
+// personas naturales comerciantes registradas en DIAN). Queda como
+// placeholder hasta que se decida si se publica el número real.
+const cedulaNegocio = import.meta.env.VITE_CEDULA_NEGOCIO || '[Número]'
 
 const fechaActualizacion = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' })
 </script>

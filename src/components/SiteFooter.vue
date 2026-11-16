@@ -38,7 +38,7 @@
     <!-- Identificación legal del negocio -->
     <div class="flex flex-col gap-1 pt-6 border-t border-[#EFEFEF] text-[12px] text-[#9A9A9A]">
       <span class="font-extrabold text-[#111111] text-[13px]">M Accesorios</span>
-      <span>{{ razonSocial }} · NIT/Cédula {{ nit }} · Cali, Colombia</span>
+      <span>Cédula {{ cedulaNegocio }} · Cali, Colombia</span>
       <span>© {{ anioActual }} M Accesorios. Todos los derechos reservados.</span>
     </div>
 
@@ -59,9 +59,10 @@ const mediosDePago = [
   { etiqueta: 'NEQ',  color: '#1A0033', colorFranja: '#DA1884', colorTexto: '#FFFFFF' },
 ]
 
-// Mismos placeholders usados en PoliticaDatosView.vue y
-// TerminosCondicionesView.vue — reemplazar con los datos reales del
-// negocio antes de producción (ver estándar de seguridad, sección 4).
-const razonSocial = import.meta.env.VITE_RAZON_SOCIAL || '[Nombre o razón social completa]'
-const nit = import.meta.env.VITE_NIT_NEGOCIO || '[Número]'
+// M Accesorios es persona natural: va cédula, no NIT (el NIT aplica a
+// empresas o a personas naturales comerciantes registradas en DIAN).
+// Mismo placeholder usado en PoliticaDatosView.vue y
+// TerminosCondicionesView.vue — queda así hasta que se decida si se
+// publica el número real (ver estándar de seguridad, sección 4).
+const cedulaNegocio = import.meta.env.VITE_CEDULA_NEGOCIO || '[Número]'
 </script>
