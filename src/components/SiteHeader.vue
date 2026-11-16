@@ -54,7 +54,14 @@
       <button @click="mostrarBuscadorMovil = !mostrarBuscadorMovil" class="sm:hidden w-10 h-10 flex items-center justify-center" aria-label="Buscar">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       </button>
-      <router-link to="/consultar-pedido" class="px-2 py-2 hover:text-acento transition-colors">Mi pedido</router-link>
+      <router-link
+        to="/consultar-pedido"
+        class="flex items-center gap-1.5 px-2.5 py-2 rounded-full hover:bg-[#F7F7F7] hover:text-acento transition-colors"
+        aria-label="Mi pedido"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span class="hidden sm:inline">Mi pedido</span>
+      </router-link>
       <router-link
         to="/favoritos"
         class="relative flex items-center justify-center w-10 h-10 rounded-full hover:bg-[#F7F7F7] transition-colors"
@@ -78,7 +85,7 @@
             class="absolute -top-2 -right-2 bg-acento text-white text-[10px] font-bold min-w-[17px] h-[17px] px-1 rounded-full flex items-center justify-center leading-none"
           >{{ cantidadTotal }}</span>
         </span>
-        <span>Carrito</span>
+        <span class="hidden sm:inline">Carrito</span>
       </router-link>
     </div>
 
@@ -147,28 +154,38 @@
 
     <div v-if="categoriasOcultas.length > 0" class="relative" ref="cajaMenuCategorias">
       <button
-        @click="mostrarMenuCategorias = !mostrarMenuCategorias"
+        @click="alternarMenuCategorias"
         class="flex items-center gap-1 py-3 text-[13px] font-bold whitespace-nowrap border-b-2 transition-colors uppercase tracking-wide"
         :class="categoriaOcultaActiva ? 'text-[#111111] border-acento' : 'text-[#6A6A6A] border-transparent hover:text-[#111111]'"
       >
         {{ categoriaOcultaActiva ? categoriaOcultaActiva.nombre : 'Más categorías' }}
         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-
-      <div
-        v-if="mostrarMenuCategorias"
-        class="absolute left-0 top-full mt-1 bg-white border border-[#EFEFEF] rounded-xl shadow-lg overflow-hidden z-20 min-w-[180px] py-1"
-      >
-        <button
-          v-for="cat in categoriasOcultas"
-          :key="cat.id"
-          @click="irACategoria(cat); mostrarMenuCategorias = false"
-          class="w-full text-left px-4 py-2.5 text-[13px] font-semibold hover:bg-[#F7F7F7] transition-colors"
-          :class="categoriaActivaId === cat.id ? 'text-acento' : 'text-[#111111]'"
-        >{{ cat.nombre }}</button>
-      </div>
     </div>
   </nav>
+
+  <!-- El panel va fuera del <nav> (vía Teleport) porque el <nav> necesita
+       "overflow-x-auto" para el scroll horizontal en móvil, y eso obliga al
+       navegador a tratar también el eje Y como recortado (regla CSS: si un
+       eje no es "visible", el otro deja de serlo aunque se lo pongamos
+       explícito) — el menú quedaba cortado dentro de esa barra en vez de
+       flotar encima. Se posiciona con coordenadas reales del botón. -->
+  <Teleport to="body">
+    <div
+      v-if="mostrarMenuCategorias"
+      ref="panelMenuCategorias"
+      class="fixed bg-white border border-[#EFEFEF] rounded-xl shadow-lg overflow-hidden z-50 min-w-[180px] py-1"
+      :style="{ top: posicionMenuCategorias.top + 'px', left: posicionMenuCategorias.left + 'px' }"
+    >
+      <button
+        v-for="cat in categoriasOcultas"
+        :key="cat.id"
+        @click="irACategoria(cat); mostrarMenuCategorias = false"
+        class="w-full text-left px-4 py-2.5 text-[13px] font-semibold hover:bg-[#F7F7F7] transition-colors"
+        :class="categoriaActivaId === cat.id ? 'text-acento' : 'text-[#111111]'"
+      >{{ cat.nombre }}</button>
+    </div>
+  </Teleport>
 </template>
 
 <script setup>
@@ -200,6 +217,23 @@ const categoriaOcultaActiva = computed(() => categoriasOcultas.value.find(c => c
 
 const mostrarMenuCategorias = ref(false)
 const cajaMenuCategorias = ref(null)
+const panelMenuCategorias = ref(null)
+const posicionMenuCategorias = ref({ top: 0, left: 0 })
+
+const alternarMenuCategorias = () => {
+  if (!mostrarMenuCategorias.value && cajaMenuCategorias.value) {
+    const rect = cajaMenuCategorias.value.getBoundingClientRect()
+    posicionMenuCategorias.value = { top: rect.bottom + 4, left: rect.left }
+  }
+  mostrarMenuCategorias.value = !mostrarMenuCategorias.value
+}
+
+// Si la página se desplaza mientras el menú está abierto, el botón se mueve
+// pero el panel (teleportado a <body>, con position: fixed) no lo seguiría
+// — más simple cerrarlo que recalcular su posición en cada scroll.
+const cerrarMenuCategoriasEnScroll = () => {
+  if (mostrarMenuCategorias.value) mostrarMenuCategorias.value = false
+}
 
 const irACategoria = (cat) => {
   if (cat) {
@@ -240,7 +274,12 @@ const cerrarDropdownAfuera = (evento) => {
   if (cajaBusquedaDesktop.value && !cajaBusquedaDesktop.value.contains(evento.target)) {
     mostrarDropdown.value = false
   }
-  if (cajaMenuCategorias.value && !cajaMenuCategorias.value.contains(evento.target)) {
+  // El panel vive teleportado en <body>, fuera del árbol de cajaMenuCategorias,
+  // así que hay que revisar ambos por separado para no cerrarlo en el mismo
+  // clic que lo abre o al elegir una categoría dentro del panel.
+  const clickEnBoton = cajaMenuCategorias.value && cajaMenuCategorias.value.contains(evento.target)
+  const clickEnPanel = panelMenuCategorias.value && panelMenuCategorias.value.contains(evento.target)
+  if (!clickEnBoton && !clickEnPanel) {
     mostrarMenuCategorias.value = false
   }
 }
@@ -248,9 +287,11 @@ const cerrarDropdownAfuera = (evento) => {
 onMounted(() => {
   cargarCatalogo()
   document.addEventListener('click', cerrarDropdownAfuera)
+  window.addEventListener('scroll', cerrarMenuCategoriasEnScroll, true)
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', cerrarDropdownAfuera)
+  window.removeEventListener('scroll', cerrarMenuCategoriasEnScroll, true)
 })
 </script>
