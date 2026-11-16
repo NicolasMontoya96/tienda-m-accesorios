@@ -26,7 +26,16 @@
 
           <div>
             <label class="block text-sm font-semibold mb-1">Teléfono *</label>
-            <input v-model="form.telefono_cliente" type="tel" required class="w-full border border-[#E0E0E0] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black">
+            <input
+              v-model="form.telefono_cliente"
+              type="tel"
+              required
+              pattern="^[0-9+\-\s]{7,15}$"
+              title="Solo números (puede incluir +, espacios o guiones), entre 7 y 15 caracteres."
+              placeholder="Ej: 3001234567"
+              class="w-full border border-[#E0E0E0] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+            >
+            <p class="text-xs text-[#9A9A9A] mt-1">Te contactaremos a este número para coordinar el pago y el envío.</p>
           </div>
 
           <div>
@@ -51,7 +60,10 @@
   </span>
 </label>
 
-          <p v-if="errorEnvio" class="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2.5">{{ errorEnvio }}</p>
+          <div v-if="errorEnvio" class="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2.5 flex flex-col gap-1.5">
+            <span>{{ errorEnvio }}</span>
+            <router-link v-if="mostrarLinkCarrito" to="/carrito" class="font-bold underline w-fit">Volver al carrito →</router-link>
+          </div>
 
           <button
             type="submit"
@@ -99,7 +111,7 @@ import SiteFooter from '../components/SiteFooter.vue'
 import { formatearPrecio } from '../utils/formato'
 
 const router = useRouter()
-const { items, totalPedido, vaciarCarrito } = useCarrito()
+const { items, totalPedido, vaciarCarrito, sincronizarStock } = useCarrito()
 
 const form = ref({
   nombre_cliente: '',
@@ -111,9 +123,11 @@ const form = ref({
 
 const enviando = ref(false)
 const errorEnvio = ref('')
+const mostrarLinkCarrito = ref(false)
 
 const enviarPedido = async () => {
   errorEnvio.value = ''
+  mostrarLinkCarrito.value = false
   enviando.value = true
   try {
     const payload = {
@@ -126,7 +140,18 @@ const enviarPedido = async () => {
   } catch (e) {
     const detalle = e.response?.data?.detail
     if (e.response?.status === 409) {
-      errorEnvio.value = detalle || 'Uno de los productos ya no tiene suficiente stock disponible. Vuelve al carrito y ajusta la cantidad.'
+      // El stock cambió entre que se agregó al carrito y este intento de
+      // pago (alguien más compró lo que quedaba). Traemos el stock real
+      // y ajustamos el carrito de una vez, para que "volver al carrito"
+      // realmente muestre lo que hay disponible en vez de repetir el error.
+      try {
+        const resCatalogo = await api.get('/productos/tienda')
+        sincronizarStock(resCatalogo.data)
+      } catch (errorSinc) {
+        // Si ni siquiera esto funciona, al menos dejamos el mensaje claro.
+      }
+      errorEnvio.value = (detalle || 'Uno de los productos ya no tiene suficiente stock disponible.') + ' Ya ajustamos las cantidades de tu carrito según lo que queda disponible — revísalo antes de volver a intentar.'
+      mostrarLinkCarrito.value = true
     } else if (e.response?.status === 429) {
       errorEnvio.value = 'Demasiados intentos en poco tiempo. Espera un minuto y vuelve a intentar.'
     } else {
