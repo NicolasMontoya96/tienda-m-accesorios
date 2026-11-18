@@ -44,9 +44,47 @@
             <p class="text-xs text-[#9A9A9A] mt-1">Te enviaremos la confirmación del pedido a este correo.</p>
           </div>
 
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-semibold mb-1">Departamento *</label>
+              <select v-model="form.departamento" required class="w-full border border-[#E0E0E0] rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black">
+                <option value="" disabled>Selecciona...</option>
+                <option v-for="depto in DEPARTAMENTOS" :key="depto" :value="depto">{{ depto }}</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold mb-1">Ciudad *</label>
+              <select
+                v-model="form.ciudad"
+                required
+                :disabled="!form.departamento"
+                class="w-full border border-[#E0E0E0] rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black disabled:bg-[#F7F7F7] disabled:text-[#9A9A9A]"
+              >
+                <option value="" disabled>{{ form.departamento ? 'Selecciona...' : 'Elige un departamento primero' }}</option>
+                <option v-for="ciudad in ciudadesDisponibles" :key="ciudad" :value="ciudad">{{ ciudad }}</option>
+              </select>
+            </div>
+          </div>
+
           <div>
-            <label class="block text-sm font-semibold mb-1">Dirección de envío *</label>
-            <textarea v-model="form.direccion_envio" required rows="2" class="w-full border border-[#E0E0E0] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black"></textarea>
+            <label class="block text-sm font-semibold mb-1">Dirección *</label>
+            <input
+              v-model="form.direccion"
+              type="text"
+              required
+              placeholder="Ej: Calle 5 # 10-20"
+              class="w-full border border-[#E0E0E0] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+            >
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold mb-1">Referencia <span class="text-[#9A9A9A] font-normal">(opcional)</span></label>
+            <input
+              v-model="form.referencia_direccion"
+              type="text"
+              placeholder="Ej: Apto 302, 2do piso, portería azul"
+              class="w-full border border-[#E0E0E0] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+            >
           </div>
 
           <label class="flex items-start gap-2.5 mt-2">
@@ -102,13 +140,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../api/axios'
 import { useCarrito } from '../composables/useCarrito'
 import SiteHeader from '../components/SiteHeader.vue'
 import SiteFooter from '../components/SiteFooter.vue'
 import { formatearPrecio } from '../utils/formato'
+import { DEPARTAMENTOS, ciudadesDe } from '../data/colombia'
 
 const router = useRouter()
 const { items, totalPedido, vaciarCarrito, sincronizarStock } = useCarrito()
@@ -117,8 +156,20 @@ const form = ref({
   nombre_cliente: '',
   telefono_cliente: '',
   email_cliente: '',
-  direccion_envio: '',
+  departamento: '',
+  ciudad: '',
+  direccion: '',
+  referencia_direccion: '',
   acepta_tratamiento_datos: false,
+})
+
+const ciudadesDisponibles = computed(() => ciudadesDe(form.value.departamento))
+
+// Si el cliente cambia de departamento, la ciudad que tenía elegida de uno
+// distinto ya no aplica — la limpiamos para que no quede una combinación
+// inválida (ej. "Cali" con "Antioquia").
+watch(() => form.value.departamento, () => {
+  form.value.ciudad = ''
 })
 
 const enviando = ref(false)
