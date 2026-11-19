@@ -1,5 +1,5 @@
 <template>
-  <div class="font-sans bg-white text-[#111111]">
+  <div class="font-sans bg-page text-[#111111]">
     <div class="max-w-[1320px] mx-auto px-[18px] sm:px-8">
 
       <!-- Header (incluye ahora la barra de categorías) -->
@@ -41,7 +41,7 @@
             <div :key="productoActivo.id" class="grid grid-cols-1 md:grid-cols-[1fr_1.15fr] md:min-h-[480px] rounded-xl overflow-hidden">
 
               <!-- Imagen: en móvil va arriba; en escritorio, a la derecha. -->
-              <div class="relative order-1 md:order-2 aspect-[16/11] md:aspect-auto bg-[#F4F4F4] overflow-hidden">
+              <div class="relative order-1 md:order-2 aspect-[16/11] md:aspect-auto bg-[#F3EFE8] overflow-hidden">
                 <img
                   v-if="productoActivo.imagen_url"
                   :src="productoActivo.imagen_url"
@@ -83,7 +83,7 @@
 
               <!-- Texto -->
               <div class="order-2 md:order-1 flex flex-col justify-center gap-4 py-10 md:py-14 px-6 sm:px-8 md:pl-10 md:pr-10 bg-white">
-                <small class="text-xs font-bold tracking-wider uppercase text-acento">Nuevo ingreso</small>
+                <small v-if="categoriaProductoActivo" class="text-[13px] font-semibold text-acento">{{ categoriaProductoActivo }}</small>
                 <h1 class="text-4xl md:text-[52px] leading-[1.02] font-extrabold tracking-tight m-0">{{ productoActivo.nombre }}</h1>
                 <p class="text-[15px] text-[#6A6A6A] max-w-[380px] leading-relaxed m-0">{{ productoActivo.descripcion || 'El mismo producto que tenemos físicamente en tienda, listo para enviar.' }}</p>
                 <div class="flex items-baseline gap-2.5">
@@ -91,7 +91,7 @@
                 </div>
                 <div class="flex gap-4 items-center mt-1">
                   <button @click="verProducto(productoActivo)" class="bg-black text-white font-bold text-sm px-6 py-3.5 rounded-full">Comprar ahora</button>
-                  <router-link :to="`/producto/${productoActivo.id}`" class="text-sm font-bold border-b-[1.5px] border-black pb-0.5">Más información →</router-link>
+                  <router-link :to="`/producto/${productoActivo.id}`" class="text-sm font-bold border-b-[1.5px] border-black pb-0.5">Más información</router-link>
                 </div>
               </div>
 
@@ -168,7 +168,7 @@ import { useCatalogo } from '../composables/useCatalogo'
 import SiteHeader from '../components/SiteHeader.vue'
 import SiteFooter from '../components/SiteFooter.vue'
 import ProductoCard from '../components/ProductoCard.vue'
-import { formatearPrecio } from '../utils/formato'
+import { formatearPrecio, nombreCategoria } from '../utils/formato'
 import { whatsappNumero } from '../utils/contacto'
 
 const route = useRoute()
@@ -183,6 +183,15 @@ const { productos: listaProductos, categorias: listaCategorias, cargando, error,
 const indiceActivo = ref(0)
 const slides = computed(() => productosFiltrados.value.slice(0, 5))
 const productoActivo = computed(() => slides.value[indiceActivo.value] || null)
+
+// Antes el eyebrow del banner decía siempre "Nuevo ingreso" sin importar
+// el producto — texto decorativo que no cambiaba con nada. En vez de ese
+// cliché, mostramos la categoría real del producto que está en pantalla.
+const categoriaProductoActivo = computed(() => {
+  if (!productoActivo.value) return null
+  return nombreCategoria(listaCategorias.value, productoActivo.value.categoria_id)
+})
+
 let intervaloCarrusel = null
 
 const siguiente = () => {
