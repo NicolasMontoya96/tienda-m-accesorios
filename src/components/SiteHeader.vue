@@ -13,7 +13,7 @@
           type="search"
           placeholder="Buscar productos..."
           @focus="mostrarDropdown = true"
-          class="w-full bg-[#F7F7F7] border border-transparent focus:border-[#E0E0E0] focus:bg-white rounded-full pl-4 pr-9 py-2 text-[13px] outline-none transition-colors"
+          class="w-full bg-white border border-[#EAE3D7] focus:border-acento rounded-full pl-4 pr-9 py-2 text-[13px] outline-none transition-colors"
         >
         <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-[#9A9A9A]" aria-label="Buscar">
           <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -98,7 +98,7 @@
             type="search"
             placeholder="Buscar productos..."
             autofocus
-            class="w-full bg-[#F7F7F7] border border-[#E0E0E0] rounded-full pl-4 pr-9 py-2.5 text-[13px] outline-none"
+            class="w-full bg-white border border-[#EAE3D7] focus:border-acento rounded-full pl-4 pr-9 py-2.5 text-[13px] outline-none transition-colors"
           >
           <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-[#9A9A9A]" aria-label="Buscar">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>

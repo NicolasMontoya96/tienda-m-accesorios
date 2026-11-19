@@ -57,7 +57,7 @@
 
       <!-- Links legales -->
       <nav class="flex flex-col sm:flex-row gap-1.5 sm:gap-6 text-[13px] text-[#B5B0A3] pt-2 border-t border-white/10">
-        <router-link to="/terminos-y-condiciones" class="hover:text-acento font-semibold pt-2">Términos y condiciones</router-link>
+        <router-link to="/terminos-y-condiciones" class="hover:text-acento font-semibold pt-2 sm:pt-0">Términos y condiciones</router-link>
         <router-link to="/politica-de-datos" class="hover:text-acento font-semibold pt-2 sm:pt-0">Política de tratamiento de datos</router-link>
       </nav>
 
