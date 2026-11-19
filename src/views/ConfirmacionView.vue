@@ -63,6 +63,12 @@
             <span class="text-[#6A6A6A]">Estado</span>
             <span class="font-bold">{{ estiloEstado.etiqueta }}</span>
           </div>
+          <div v-if="pedido.transportadora || pedido.numero_guia" class="flex justify-between text-sm">
+            <span class="text-[#6A6A6A]">Envío</span>
+            <span class="font-semibold text-right">
+              {{ pedido.transportadora }}<span v-if="pedido.transportadora && pedido.numero_guia"> &middot; </span><span v-if="pedido.numero_guia">Guía {{ pedido.numero_guia }}</span>
+            </span>
+          </div>
           <div class="flex flex-col gap-2 divide-y divide-[#E5E5E5] pt-2 mt-1 border-t border-[#E5E5E5]">
             <div v-for="detalle in pedido.detalles" :key="detalle.id" class="flex justify-between pt-2 first:pt-0 text-sm">
               <span class="text-[#6A6A6A]">{{ detalle.nombre_producto }} × {{ detalle.cantidad }}</span>
@@ -256,6 +262,12 @@ const iniciarCuentaRegresivaSiAplica = () => {
 
 const estiloEstado = computed(() => {
   const estado = pedido.value?.estado
+  if (estado === 'entregado') {
+    return { icono: '✓', circulo: 'bg-slate-200 text-slate-700', titulo: '¡Pedido entregado!', etiqueta: 'Entregado', mensaje: 'Tu pedido ya fue entregado. ¡Gracias por tu compra!' }
+  }
+  if (estado === 'enviado') {
+    return { icono: '📦', circulo: 'bg-blue-100 text-blue-700', titulo: '¡Tu pedido va en camino!', etiqueta: 'Enviado', mensaje: 'Ya despachamos tu pedido. Pronto debería llegar a la dirección que nos diste.' }
+  }
   if (estado === 'pagado') {
     return { icono: '✓', circulo: 'bg-green-100 text-green-700', titulo: '¡Pago confirmado!', etiqueta: 'Pagado', mensaje: 'Tu pedido fue confirmado y pronto lo estaremos preparando para enviar.' }
   }
